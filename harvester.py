@@ -76,8 +76,8 @@ def push_to_azure_sql(df):
 
     # 2. Build the connection string
     # We use ODBC Driver 17, which is standard on most Windows machines
-    # driver = '{ODBC Driver 17 for SQL Server}'
-    driver = '{SQL Server}'
+    driver = '{ODBC Driver 18 for SQL Server}'
+    # driver = '{SQL Server}'
     
     print(f"\nConnecting to Azure SQL Database: {database}...")
     try:
