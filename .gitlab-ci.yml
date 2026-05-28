@@ -20,4 +20,4 @@ build_image:
     - echo "Pushing the container to GitLab Registry..."
     - docker push $IMAGE_TAG
     - docker tag $IMAGE_TAG $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:latest 
