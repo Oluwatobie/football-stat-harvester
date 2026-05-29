@@ -119,6 +119,8 @@ jobs:
             --restart-policy Never \
             --location uksouth \
             --os-type Linux \
+            --cpu 1 \
+            --memory 1.5 \
             --environment-variables \
                 DB_SERVER=${{ env.SQL_SERVER }}.database.windows.net \
                 DB_NAME=sqldb-football-stats \
