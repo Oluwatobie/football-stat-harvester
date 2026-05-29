@@ -77,9 +77,11 @@ jobs:
         run: |
           az group create --name rg-football-stats --location uksouth --tags "football-stats-environment=dev"
           
-          # --- THE BULLETPROOF PURGE SCRIPT ---
-          echo "Checking for deleted Key Vaults..."
-          DELETED_VAULTS=$(az keyvault list-deleted --query "[?starts_with(name, 'kv-fb-')].name" -o tsv)
+          # --- THE CATCH-ALL PURGE SCRIPT ---
+          echo "Checking for ANY deleted Key Vaults..."
+          
+          # Notice we removed the starts_with filter so it catches everything
+          DELETED_VAULTS=$(az keyvault list-deleted --query "[].name" -o tsv)
           
           if [ ! -z "$DELETED_VAULTS" ]; then
             for vault in $DELETED_VAULTS; do
