@@ -126,4 +126,5 @@ jobs:
                 DB_NAME=sqldb-football-stats \
                 DB_USER=dbadmin \
             --secure-environment-variables \
-                DB_PASS=${{ secrets.DB_PASSWORD }}
+                DB_PASS=${{ secrets.DB_PASSWORD }} \
+                FOOTBALL_API_KEY=${{ secrets.FOOTBALL_API_KEY }}

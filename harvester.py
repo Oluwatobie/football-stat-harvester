@@ -11,7 +11,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables
 load_dotenv()
-API_KEY = os.getenv("API_KEY")
+api_key = os.getenv("FOOTBALL_API_KEY")
 
 # Premier League (39)
 LEAGUE_ID = 39 
@@ -24,7 +24,7 @@ def fetch_standings():
     querystring = {"league": str(LEAGUE_ID), "season": str(SEASON)}
     
     headers = {
-        "x-apisports-key": API_KEY
+        "x-apisports-key": api_key
     }
 
     print(f"Fetching Premier League Standings for season {SEASON}...")
@@ -117,4 +117,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
