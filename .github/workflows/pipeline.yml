@@ -80,7 +80,6 @@ jobs:
           # --- THE CATCH-ALL PURGE SCRIPT ---
           echo "Checking for ANY deleted Key Vaults..."
           
-          # Notice we removed the starts_with filter so it catches everything
           DELETED_VAULTS=$(az keyvault list-deleted --query "[].name" -o tsv)
           
           if [ ! -z "$DELETED_VAULTS" ]; then
@@ -119,6 +118,7 @@ jobs:
             --registry-password ${{ secrets.GH_REGISTRY_PASSWORD }} \
             --restart-policy Never \
             --location uksouth \
+            --os-type Linux \
             --environment-variables \
                 DB_SERVER=${{ env.SQL_SERVER }}.database.windows.net \
                 DB_NAME=sqldb-football-stats \
