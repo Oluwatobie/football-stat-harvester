@@ -21,11 +21,20 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Rebuild the cloud infrastructure automatically
+      - name: Deploy Infrastructure (Bicep)
+        run: |
+          az group create --name rg-football-stats --location uksouth --tags "football-stats-environment=dev"
+          az deployment group create \
+            --resource-group rg-football-stats \
+            --template-file main.bicep \
+            --parameters sqlAdminUser=dbadmin sqlAdminPassword=${{ secrets.DB_PASSWORD }} myIpAddress=0.0.0.0
+
       # Convert repository name to lowercase
       - name: Downcase repository name
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
-      # THE MAGIC FIX: Dynamically find the SQL Server name and save it to the environment!
+      # Dynamically find the SQL Server name and save it to the environment!
       - name: Get dynamic SQL Server Name
         run: |
           SERVER_NAME=$(az sql server list --resource-group rg-football-stats --query "[0].name" -o tsv)

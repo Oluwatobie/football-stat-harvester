@@ -14,7 +14,7 @@ var resourceTags = {
   'football-stats-environment': 'dev'
 }
 
-// 1. THE VIRTUAL NETWORK
+// THE VIRTUAL NETWORK
 resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   name: 'vnet-football'
   location: location
@@ -36,7 +36,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   }
 }
 
-// 2. THE KEY VAULT
+//  THE KEY VAULT
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: keyVaultName
   location: location
@@ -48,7 +48,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
-// 3. THE SQL SERVER
+//  THE SQL SERVER
 resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   name: sqlServerName
   location: location
@@ -59,7 +59,7 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   }
 }
 
-// 4. THE SERVERLESS SQL DATABASE
+// THE SERVERLESS SQL DATABASE
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
   parent: sqlServer
   name: 'sqldb-football-stats'
@@ -72,7 +72,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
   }
 }
 
-// 5. THE SQL FIREWALL RULE 
+// THE SQL FIREWALL RULE 
 resource sqlFirewall 'Microsoft.Sql/servers/firewallRules@2022-05-01-preview' = {
   parent: sqlServer
   name: 'AllowMyIP'
