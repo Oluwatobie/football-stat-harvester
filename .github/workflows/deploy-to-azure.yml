@@ -1,0 +1,52 @@
+name: Deploy the container to ACI & Run it
+
+# Trigger only when the build pipeline succeeds
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"] 
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy_to_azure:
+    name: Deploy Container to Azure
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      # Log into Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Convert repository name to lowercase
+      - name: Downcase repository name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      # THE MAGIC FIX: Dynamically find the SQL Server name and save it to the environment!
+      - name: Get dynamic SQL Server Name
+        run: |
+          SERVER_NAME=$(az sql server list --resource-group rg-football-stats --query "[0].name" -o tsv)
+          echo "SQL_SERVER=$SERVER_NAME" >> $GITHUB_ENV
+          echo "Discovered SQL Server: $SERVER_NAME"
+
+      #  Deploy the Container (Notice DB_SERVER now uses the dynamic variable!)
+      - name: Deploy to Azure Container Instances (ACI)
+        run: |
+          az container create \
+            --resource-group rg-football-stats \
+            --name aci-football-harvester \
+            --image ghcr.io/${{ env.REPO }}:latest \
+            --registry-login-server ghcr.io \
+            --registry-username ${{ github.actor }} \
+            --registry-password ${{ secrets.GH_REGISTRY_PASSWORD }} \
+            --restart-policy Never \
+            --location uksouth \
+            --environment-variables \
+                DB_SERVER=${{ env.SQL_SERVER }}.database.windows.net \
+                DB_NAME=sqldb-football-stats \
+                DB_USER=dbadmin \
+            --secure-environment-variables \
+                DB_PASS=${{ secrets.DB_PASSWORD }}

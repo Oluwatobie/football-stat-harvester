@@ -81,3 +81,4 @@ resource sqlFirewall 'Microsoft.Sql/servers/firewallRules@2022-05-01-preview' = 
     endIpAddress: myIpAddress
   }
 }
+
