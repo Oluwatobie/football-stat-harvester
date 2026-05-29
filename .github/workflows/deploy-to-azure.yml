@@ -42,7 +42,7 @@ jobs:
           az deployment group create \
             --resource-group rg-football-stats \
             --template-file main.bicep \
-            --parameters sqlAdminUser=dbadmin myIpAddress=0.0.0.0
+            --parameters sqlAdminUser=dbadmin sqlAdminPassword=${{ secrets.DB_PASSWORD }} myIpAddress=0.0.0.0
 
       # Convert repository name to lowercase
       - name: Downcase repository name
