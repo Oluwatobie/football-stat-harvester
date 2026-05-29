@@ -77,12 +77,21 @@ jobs:
         run: |
           az group create --name rg-football-stats --location uksouth --tags "football-stats-environment=dev"
           
-          DELETED_VAULT=$(az keyvault list-deleted --query "[?starts_with(name, 'kv-fb-')].name" -o tsv)
-          if [ ! -z "$DELETED_VAULT" ]; then
-            echo "Found deleted vault: $DELETED_VAULT. Purging it now..."
-            az keyvault purge --name $DELETED_VAULT
-            sleep 30 
+          # --- THE BULLETPROOF PURGE SCRIPT ---
+          echo "Checking for deleted Key Vaults..."
+          DELETED_VAULTS=$(az keyvault list-deleted --query "[?starts_with(name, 'kv-fb-')].name" -o tsv)
+          
+          if [ ! -z "$DELETED_VAULTS" ]; then
+            for vault in $DELETED_VAULTS; do
+              echo "Purging deleted vault: $vault"
+              az keyvault purge --name $vault
+            done
+            echo "Waiting 60 seconds for Azure's backend to fully clear the names..."
+            sleep 60 
+          else
+            echo "No deleted vaults found. Moving on!"
           fi
+          # ------------------------------------
 
           az deployment group create \
             --resource-group rg-football-stats \
