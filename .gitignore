@@ -1,1 +1,3 @@
 .env
+.github\workflows\docker-build.yml
+.github\workflows\deploy-to-azure.yml
