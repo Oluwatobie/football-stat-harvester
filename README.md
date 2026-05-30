@@ -5,6 +5,7 @@
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 
 ## 📖 Project Overview
 A fully automated, ephemeral data engineering pipeline that fetches live English Premier League (2023 Season) standings daily, processes the data, and securely loads it into a cloud SQL database for real-time visualization. 
@@ -15,11 +16,11 @@ This project demonstrates **Infrastructure as Code (IaC)**, **containerization**
 1. **GitHub Actions (CI/CD & Cron):** A workflow runs daily at 4:00 AM UTC.
 2. **Infrastructure as Code (Bicep):** Automatically provisions an Azure Resource Group, Azure SQL Server, and manages networking/firewalls. Includes an automated "catch-all" script to safely purge soft-deleted Key Vaults during rebuilds.
 3. **Ephemeral Compute (Azure Container Instances):** Pulls a custom Docker image from GitHub Container Registry (GHCR) containing the Python harvester script.
-4. **Data Ingestion (Python & API-Sports):** The script dynamically securely retrieves the `FOOTBALL_API_KEY`, calls the API for the latest league standings, safely wipes yesterday's data (`TRUNCATE`), and inserts the fresh data to prevent duplicates.
+4. **Data Ingestion (Python & API-Sports):** The script securely retrieves the `FOOTBALL_API_KEY`, calls the API for the latest league standings, transforms the JSON into a Pandas DataFrame, and safely replaces yesterday's table (`if_exists="replace"`) to prevent duplicates.
 5. **Visualization (Grafana):** A live Grafana dashboard queries the Azure SQL database to display a broadcast-quality Premier League table.
 
 ## 🛠️ Tech Stack
-* **Language:** Python 3
+* **Language:** Python 3 (Pandas, SQLAlchemy, Requests)
 * **Infrastructure as Code:** Azure Bicep
 * **Cloud Provider:** Microsoft Azure (SQL Database, Container Instances)
 * **Containerization:** Docker, GitHub Container Registry (GHCR)
@@ -39,14 +40,8 @@ To run this pipeline, the following secrets must be configured in GitHub Actions
 ## 🚀 How It Works Under the Hood
 
 ### The Data Harvester (`harvester.py`)
-The Python script is designed for idempotency. It connects to the Azure SQL database using `pyodbc`, ensures the `PremierLeagueStandings` table exists, and performs a complete data refresh:
+The Python script is designed for complete idempotency. It transforms the raw API JSON into a clean Pandas DataFrame, then uses SQLAlchemy to connect to the Azure SQL Database. Instead of manually deleting old data, it leverages the Pandas `to_sql` method to safely drop and recreate the table on every run:
 
-`TRUNCATE TABLE PremierLeagueStandings;`
-
-### The CI/CD Pipeline (`pipeline.yml`)
-The GitHub Action is divided into two primary jobs:
-1. **Build & Push:** Packages the Python script and dependencies into a Docker image and pushes it to GHCR.
-2. **Deploy Infrastructure:** Uses Azure Bicep to deploy the SQL Database and executes `az container create` to spin up the ephemeral scraper with strict resource limits (`1 CPU`, `1.5 GB RAM`) and secure environment variables.
-
-## 📊 Live Dashboard
-The data is natively connected to Grafana using the Microsoft SQL Server plugin. The dashboard features custom value-mappings (e.g., dynamically coloring the 'Form' column green for Wins and red for Losses) to replicate professional sports analytics.
+```python
+# Drops the old table and creates a fresh one every time it runs to prevent duplicates
+df.to_sql("PremierLeagueStandings", engine, if_exists="replace", index=False)
