@@ -15,9 +15,9 @@ on:
    # Run automatically on a schedule
   schedule:
     # Run at 04:00 AM every single day
-    # - cron: '0 4 * * *'   
+    - cron: '0 4 * * *'   
     # Runs every 15 minutes
-    - cron: '*/15 * * * *'
+    # - cron: '*/15 * * * *'
 
 jobs:
   # ----------------------------------------------------

@@ -13,7 +13,7 @@ A fully automated, ephemeral data engineering pipeline that fetches live English
 This project demonstrates **Infrastructure as Code (IaC)**, **containerization**, and the **"Phoenix Server" architecture pattern**—meaning the entire infrastructure can be torn down and automatically rebuilt from scratch via CI/CD without human intervention.
 
 ## 🏗️ Architecture & Workflow
-1. **GitHub Actions (CI/CD & Cron):** A workflow runs daily at 4:00 AM UTC.
+1. **GitHub Actions (CI/CD & Cron):** A workflow runs every day @ 4am (For POC purposes).
 2. **Infrastructure as Code (Bicep):** Automatically provisions an Azure Resource Group, Azure SQL Server, and manages networking/firewalls. Includes an automated "catch-all" script to safely purge soft-deleted Key Vaults during rebuilds.
 3. **Ephemeral Compute (Azure Container Instances):** Pulls a custom Docker image from GitHub Container Registry (GHCR) containing the Python harvester script.
 4. **Data Ingestion (Python & API-Sports):** The script securely retrieves the `FOOTBALL_API_KEY`, calls the API for the latest league standings, transforms the JSON into a Pandas DataFrame, and safely replaces yesterday's table (`if_exists="replace"`) to prevent duplicates.
